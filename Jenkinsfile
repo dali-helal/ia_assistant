@@ -28,8 +28,11 @@ pipeline {
     
     stage('Build Docker Image') {
       steps {
-        script {
-          docker.build("vite-react-ts:${env.BUILD_NUMBER}")
+        withCredentials([usernamePassword(credentialsId: 'docker-hub-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+          bat """
+            docker build -t %DOCKER_USER%/vite-react-ts:${env.BUILD_NUMBER} .
+            docker build -t %DOCKER_USER%/vite-react-ts:latest .
+          """
         }
       }
     }
@@ -39,7 +42,9 @@ pipeline {
         withCredentials([usernamePassword(credentialsId: 'docker-hub-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
           bat """
             echo %DOCKER_PASS% | docker login -u %DOCKER_USER% --password-stdin
-            docker push vite-react-ts:${env.BUILD_NUMBER}
+            docker push %DOCKER_USER%/vite-react-ts:${env.BUILD_NUMBER}
+            docker push %DOCKER_USER%/vite-react-ts:latest
+            docker logout
           """
         }
       }
@@ -49,6 +54,12 @@ pipeline {
   post {
     always {
       cleanWs()
+    }
+    success {
+      echo 'Pipeline completed successfully!'
+    }
+    failure {
+      echo 'Pipeline failed!'
     }
   }
 }
