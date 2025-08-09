@@ -31,7 +31,6 @@ pipeline {
         withCredentials([usernamePassword(credentialsId: 'docker-hub-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
           bat """
             docker build -t %DOCKER_USER%/vite-react-ts:${env.BUILD_NUMBER} .
-            docker build -t %DOCKER_USER%/vite-react-ts:latest .
           """
         }
       }
@@ -43,7 +42,6 @@ pipeline {
           bat """
             echo %DOCKER_PASS% | docker login -u %DOCKER_USER% --password-stdin
             docker push %DOCKER_USER%/vite-react-ts:${env.BUILD_NUMBER}
-            docker push %DOCKER_USER%/vite-react-ts:latest
             docker logout
           """
         }
