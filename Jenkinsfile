@@ -4,7 +4,7 @@ pipeline {
   stages {
     stage('Checkout') {
       steps {
-        git branch: 'main', url: 'https://github.com/dali-helal/ia_assistant.git'
+        git branch: 'deploy', url: 'https://github.com/dali-helal/ia_assistant.git'
       }
     }
     
